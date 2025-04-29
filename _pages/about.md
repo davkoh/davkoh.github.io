@@ -12,7 +12,7 @@ I am a Postdoctoral Researcher in the [Bayesian Workflow Group](https://users.aa
   
 My research interests cover broadly Bayesian Statistics and their application in social science research. I've had the opportunity of applying my work as a PhD researcher at the Bank of England (Current Economic Conditions Division).
 
-I am the course manager of the largest Bayesian statistics course in Finland, [Bayesian Data Anlysis](https://avehtari.github.io/BDA_course_Aalto/).
+I am the course manager of one of the largest Bayesian statistics course in the world, [Bayesian Data Analysis](https://avehtari.github.io/BDA_course_Aalto/).
 
 I am a reviewer for several journals including *International Journal of Forecasting*, *Electronic Journal of Statistics* and *Statistica Sinica*, among many more.
 
