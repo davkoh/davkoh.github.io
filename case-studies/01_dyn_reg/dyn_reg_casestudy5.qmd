@@ -1,11 +1,11 @@
 ---
 title: "Dynamic Regression Case Study"
 author: "David Kohns"
-date: 2025-03-27
+date: 2025-06-04
 date-modified: today
 date-format: iso
 execute:
-  cache: true
+  cache: false
 format:
   html:
     toc: true
@@ -114,6 +114,7 @@ library(ggdist)
 theme_set(bayesplot::theme_default(base_family = "sans"))
 library(reshape2)
 library(cmdstanr)
+library(loo)
 
 # Functions
 calculate_rolling_betas <- function(emp_app, T_start) {
@@ -176,8 +177,9 @@ extract_r2 <- function(fit, model_name, timevec) {
   data.frame(R2_t = r2_mean, Time = timevec[1:length(r2_mean)], Model = model_name)
 }
 
+
 # Helper function for comparing predictive performance
-compare_elpd <- function(fit_objects) {
+compare_mlpd <- function(fit_objects) {
   # Extract yf_lpdf from fit objects
   extract_yf_lpdf <- function(fit) {
     as.matrix(fit$draws("yf_lpdf"))
@@ -190,39 +192,48 @@ compare_elpd <- function(fit_objects) {
   if (is.null(model_names)) {
     model_names <- paste0("model_", seq_along(fit_objects))
   }
-  
-  # Calculate mean log-likelihood and standard error for each model
+
+  # Calculate mean log-likelihood for each model
   mean_ll <- sapply(log_likelihoods, mean)
-  se_ll <- sapply(log_likelihoods, function(ll) sd(ll) / sqrt(length(ll)))
   
   # Identify the best predicting model
   best_model_index <- which.max(mean_ll)
   best_model_name <- model_names[best_model_index]
-  
-  # Initialize vectors for ELPD differences and their standard errors
-  elpd_diff <- numeric(length(fit_objects))
+
+  # Initialize vectors for MLPD differences and their standard errors
+  mlpd_diff <- numeric(length(fit_objects))
   se_diff <- numeric(length(fit_objects))
   
   # Calculate differences relative to the best predicting model
   for (i in seq_along(fit_objects)) {
-    elpd_diff[i] = mean_ll[i] - mean_ll[best_model_index]
-    se_diff[i] = sqrt(se_ll[i]^2 + se_ll[best_model_index]^2)
+    if (i != best_model_index) {
+      # Calculate pointwise differences
+      pointwise_diff <- log_likelihoods[[i]] - log_likelihoods[[best_model_index]]
+      
+      # Calculate MLPD differences
+      mlpd_diff[i] <- mean_ll[i] - mean_ll[best_model_index]
+      
+      # Calculate Monte Carlo standard error
+      n_draws <- length(pointwise_diff)
+      se_diff[i] <- sd(pointwise_diff) / sqrt(n_draws)
+    }
   }
-  
+
   # Round results to 2 decimal places
-  elpd_diff <- round(elpd_diff, 2)
+  mlpd_diff <- round(mlpd_diff, 2)
   se_diff <- round(se_diff, 2)
   
   # Create a comparison table
   comparison_table <- tibble::tibble(
     Model = model_names,
-    elpd_diff = elpd_diff,
+    mlpd_diff = mlpd_diff,
     se_diff = se_diff
   ) %>%
-    arrange(desc(elpd_diff))
+    arrange(desc(mlpd_diff))
 
   return(comparison_table)
 }
+
 
 minn_sig_create <- function(X,lags){
   X <- as.matrix(X)
@@ -271,7 +282,10 @@ frednames <- c("INDPRO","IPMANSICS","CUMFNS","HOUST","PERMIT","USGOOD","MANEMP"
 ####----- Preparation Steps -----####
 
 ## 1: Supply FRED mnemonics for data download.  We follow Hauzenber et al. (2023)
-filepath <- "https://files.stlouisfed.org/files/htdocs/fred-md/monthly/2024-06.csv"
+#filepath <- "https://files.stlouisfed.org/files/htdocs/fred-md/monthly/2024-06.csv"
+filepath<- "/Users/dk/Downloads/2024-06.csv"
+
+
 
 startdate <- as.Date("01/01/1980","%m/%d/%Y")
 enddate <- as.Date("01/01/2024","%m/%d/%Y")
@@ -756,9 +770,8 @@ fit_objects <- list(
   rhs = fit_rhs
 )
 
-comparison_table <- compare_elpd(fit_objects)
+comparison_table <- compare_mlpd(fit_objects)
 print(comparison_table)
-
 
 ```
 
