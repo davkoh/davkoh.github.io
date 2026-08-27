@@ -1,2 +1,20 @@
+# Jekyll build output
 _site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
 
+# macOS
+.DS_Store
+
+# Quarto
+.quarto/
+/.quarto/
+
+# Knitr / Quarto chunk caches -- regenerable, and very large (~1.5 GB each)
+**/*_cache/
+
+# Compiled Stan model binaries (platform-specific); keep the .stan sources
+case-studies/**/stan/*
+!case-studies/**/stan/
+!case-studies/**/stan/*.stan

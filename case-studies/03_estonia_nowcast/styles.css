@@ -1,0 +1,26 @@
+.katex {
+  font-size: 0.85em; /* Adjust this value as needed */
+}
+
+@media (min-width: 992px) {
+  #quarto-content.page-layout-article.toc-left {
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    column-gap: 2rem;
+  }
+
+  #quarto-sidebar-toc-left {
+    grid-column: 1;
+  }
+
+  
+  #quarto-document-content {
+    grid-column: 2;
+    max-width: min(900px, 100%);
+  }
+}
+
+#quarto-document-content p {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}

@@ -16,5 +16,11 @@ I am the course manager of one of the largest Bayesian statistics courses in the
 
 I am a reviewer for several journals including *International Journal of Forecasting*, *Electronic Journal of Statistics* and *Statistica Sinica*, among many more.
 
+News
+======
+
+- **August 2026** — New case study out: [Nowcasting Estonian GDP with Bayesian MIDAS](/case-studies/03_estonia_nowcast/index.html), featuring a real-time Estonian dataset, a suite of mixed-frequency models, and a continually updated performance benchmark.
+- **August 2026** — I served as a session chair at [StanCon 2026](https://www.stancon2026.org/) in Uppsala (17–21 August 2026). A [recording of the session I chaired](https://www.youtube.com/watch?v=wIR1YXFrNaE&t=1144s) is available on YouTube.
+
 [CV](https://github.com/davkoh/davkoh.github.io/blob/master/files/CVDavidKohns.pdf) 
 

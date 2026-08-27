@@ -1,5 +1,17 @@
+- title: "Nowcasting Estonian GDP with Bayesian MIDAS"
+  subtitle: "A real-time Estonian dataset, a suite of mixed-frequency models, and a continually updated performance benchmark."
+  url: "/case-studies/03_estonia_nowcast/index.html"
+  author: "David Kohns"
+  date: 2026-08-26
+
 - title: "Dynamic Regression using the ARR2 Prior"
+  subtitle: "The ARR2 prior for time-varying parameter regression, applied to US inflation forecasting."
   url: "/case-studies/01_dyn_reg/dyn_reg_casestudy5.html"
   author: "David Kohns"
   date: 2025-03-27
 
+- title: "Dynamic Regression using the ARR2 Prior"
+  url: "/case-studies/hidden_posts/dyn_reg_casestudy5.html"
+  author: "David Kohns"
+  date: 2025-04-07
+  hidden: true

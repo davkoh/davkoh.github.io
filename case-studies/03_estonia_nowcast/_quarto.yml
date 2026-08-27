@@ -1,0 +1,28 @@
+project:
+  type: default
+  output-dir: .
+
+execute:
+  echo: true
+  warning: false
+  message: false
+
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    toc-collapse: true
+    number-sections: true
+    smooth-scroll: true
+    theme: readable
+    code-copy: true
+    code-download: true
+    code-fold: true
+    code-tools: true
+    embed-resources: true
+    anchor-sections: true
+    html-math-method: katex
+    css: styles.css
+
+bibliography: references.bib
