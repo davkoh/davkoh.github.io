@@ -37,21 +37,24 @@ val <- function(spec, subsample, metric) {
 
 # Purpose
 
-@kohns2025midas develop a Bayesian mixed-data-sampling framework that combines group-shrinkage priors for MIDAS problems, allows for estimation of slow-moving stochastic trends and stochastic volatilities with flexible hierarchical priors, and remains interpretable to the nowcaster due to the post-estimation sparsification algorithm which informs on variable importance over the nowcast cycle.. The accompanying estimation code is released as the BMIDAS-GIGG toolbox [@bmidasgigg].
+@kohns2025midas develop a Bayesian mixed-data-sampling framework (BMIDAS) that applies group-shrinkage priors (GIGG), allows for estimation of latent (potentially slow-moving) trends and stochastic volatility with flexible hierarchical priors, and remains interpretable to the nowcaster due to the post-estimation sparsification algorithm which informs on variable importance over the nowcast cycle. The accompanying estimation code is released as the BMIDAS-GIGG toolbox [@bmidasgigg].
 
-So far this framework has been applied only to the UK data. Small open economies such as Estonia differ from the United Kingdom in the composition of their indicator sets, in the length of their reliable statistical record (which tends to start reliably typically in the early 2000's), and in the size of the shocks that the trend and volatility components absorb. Hence, in this case study, we put the Bayesian machinery of @kohns2025midas to the test by applying it to nowcasting Estonian q-o-q real GDP growth.
+So far this framework has been applied to UK data only. Small open (post-Soviet) economies such as Estonia differ from the United Kingdom in the composition of their indicator sets, in the length of their reliable statistical record (which tends to start reliably typically in the early 2000's), and in the size and nature of shocks. Hence, in this case study, we put the Bayesian machinery of @kohns2025midas to the test by applying it to nowcasting Estonian q-o-q real GDP growth.
 
-This case study has three aims.
+Next to the specific application to nowcasting to new data, this case study also functions as a resource to document the various nowcasting methods at the frontier of Bayesian modelling (and therefore might be often updated) as well as describe a the data for a data base which will be publically available for the Estonian economy (and hopefully more in the future).
 
-1.  Build a dataset suitable for nowcasting Estonian macroeconomic activity, assembled directly from source APIs, and archived as real-time vintages so that genuine real-time exercises become possible with time. While this post covers mostly methodology and initial results, a webpage is in the works access to the data.
-2.  Provide a suite of publicly accessible models with a continually updated performance benchmark, so that the comparison between model classes is reproducible.
-3.  Use the results to identify modelling avenues and to document what the estimates imply about Estonian macroeconomic dynamics.
+I summarise the aims of case study as as follows:
 
-The code for the data pipeline, the model drivers and every figure below is available will be made available soon.
+1.  Apply the BMIDAS-GIGG framework to nowcasting Estonian real GDP growth.
+2.  Build a dataset suitable for nowcasting Estonian macroeconomic activity, assembled directly from source APIs, and archived as real-time vintages so that genuine real-time exercises become possible with time.[^1]
+3.  Describe the frontier in Bayesian nowcasting models and benchmarking them on Estonian data. The model suite will be made publicly available.
+4.  Use the results to identify modelling avenues and to document what the estimates imply about Estonian macroeconomic dynamics.
+
+[^1]: While this post covers mostly methodology and initial results, a link and api to the compiled data base to access the data are in the works.
 
 # Data description
 
-## Coverage
+## Coverage and Role of Data
 
 The core dataset contains eleven monthly indicators in four groups. Survey indicators cover manufacturing, construction and retail confidence together with consumer confidence and consumer price expectations. Real Activity is represented by the industrial production volume index and by accommodated tourists. Prices enter through the consumer and producer price indices. Energy enters through electricity and heat production. The target is quarterly GDP growth, chain-linked volume, seasonally and working-day adjusted.
 
@@ -101,15 +104,13 @@ tibble(series = c(core_series, fin_series, for_series)) %>%
   kable()
 ```
 
-Seasonal adjustment is handled series by series and the treatment differs across the panel. Industrial production is calendar and seasonally adjusted by Statistics Estonia at source and is passed through unchanged. Tourists, the consumer and producer price indices, and electricity and heat production are published unadjusted, and we adjust them ourselves by seasonal-trend decomposition using loess. The survey balances are also adjusted by us rather than at source, for the reason set out below. Financial series and the foreign activity index are not adjusted in the pipeline, the former because financial prices carry no seasonal, the latter because Eurostat publishes it already adjusted.
+Seasonal adjustment is handled series by series and the treatment differs across the panel. Industrial production is calendar and seasonally adjusted by Statistics Estonia at source and is passed through unchanged. Tourists, the consumer and producer price indices, and electricity and heat production are published unadjusted, and we adjust them ourselves by seasonal-trend decomposition using loess. The survey balances are also adjusted by us rather than at source, for the reason set out below. Financial series and the foreign activity index are not seasonally adjusted, the former because financial prices carry no seasonality, the latter because Eurostat publishes it already adjusted.
 
-The provenance of the survey balances changed during this project. They were originally pulled from the OECD short-term statistics feed, which stops in April 2026. They are now assembled from the unadjusted Eurostat history joined to the Statistics Estonia BAR tables, which is the arrangement described next.
-
-One data quirk requires separate treatment. Estonia's business and consumer survey moved from the Estonian Institute of Economic Research to Statistics Estonia in May 2026, and publication of the Estonian data by the European Commission has been suspended in the interim. The historical and current halves therefore come from different producers and there is no overlap on which to calibrate the joint series. Both halves are taken unadjusted, and a single pass of X-13ARIMA-SEATS with a user-specified level shift at the break performs the seasonal adjustment and the level correction on one consistent basis. The level shift is estimated from very few post-break observations, so the recent survey values carry more uncertainty than the historical ones.
+One data quirk requires separate treatment. Estonia's business and consumer survey moved from the Estonian Institute of Economic Research to Statistics Estonia in May 2026, and publication of the Estonian data by the European Commission has been suspended in the interim. The historical and current tranches therefore come from different producers and there is no overlap on which to calibrate the joint series. Both halves are taken unadjusted, and a single pass of X-13ARIMA-SEATS with a user-specified level shift at the break (May 2026) performs the seasonal adjustment and the level correction in one go. Since the level shift is estimated from very few post-break observations, the post shift survey observations may carry more uncertainty than the historical ones. As more data accumulates, we will be able to adjust this procedure further.
 
 ## Stylised release calendar
 
-Since the model suite we propose in @kohns2025midas is based on the MIDAS methodology, which is a direct nowcasting technique, the models are re-estimates at the identified data publication days within each nowcast cycle. In our case, we stylise this release calendar to fifteen points inside each quarter. At each point the model observes only what would genuinely have been published by then. The publication delay records how many months after a reference month an observation appears, where zero means within the reference month itself. The slot orders publications inside a month.
+The model suite we propose in @kohns2025midas is based on the MIDAS methodology. This is a direct nowcasting technique (see @banbura2013nowcasting), where the models are re-estimated at the identified data publication days within each nowcast cycle. In our case, we stylise this release calendar to fifteen points inside each quarter. At each point the model observes only what would genuinely have been published by then. The publication delay records how many months after a reference month an observation appears, where zero means within the reference month itself. Slot in the below refers to the sequencing group in which the data arrive (this is often necessary to include since also in real time, many data series, often by the same provider, are published together).
 
 ```{r calendar}
 #| label: tbl-calendar
@@ -133,8 +134,6 @@ calendar %>%
   rename_with(~ hdr, starts_with("r")) %>%
   kable()
 ```
-
-Your reading is the correct one. The model carries six monthly lags of each indicator, which happens to span the three months of the quarter being nowcast and the three of the quarter before it. Availability in @tbl-calendar is counted out of those six lags.
 
 Surveys are published without any delay and all six lags are available by round nine. Industrial production, with its two-month delay, has only one lag available at round one and still only five at round fifteen. The third month of the target quarter is therefore never observed for hard activity before the GDP flash estimate arrives, which is the informational problem the model exists to address.
 
