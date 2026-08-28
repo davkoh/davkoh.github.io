@@ -2,6 +2,24 @@
   font-size: 0.85em; /* Adjust this value as needed */
 }
 
+/* Keep long display equations within the content column. */
+#quarto-document-content .katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.2rem;
+}
+
+#quarto-document-content .katex-display > .katex {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  #quarto-document-content .katex {
+    font-size: 0.78em;
+  }
+}
+
 @media (min-width: 992px) {
   #quarto-content.page-layout-article.toc-left {
     grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);

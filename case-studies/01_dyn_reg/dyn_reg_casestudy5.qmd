@@ -1,9 +1,20 @@
 ---
 title: "Dynamic Regression Case Study"
-author: "David Kohns"
+author:
+  - name: David Kohns
+    email: david.kohns@aalto.fi
+    affiliation: Aalto University
 date: 2025-06-04
 date-modified: today
 date-format: iso
+google-scholar: true
+citation:
+  type: webpage
+  container-title: "Case Studies in Bayesian Nowcasting"
+  publisher: "Aalto University"
+  url: https://davkoh.github.io/case-studies/01_dyn_reg/dyn_reg_casestudy5.html
+  pdf-url: https://davkoh.github.io/case-studies/01_dyn_reg/dyn_reg_casestudy5.pdf
+  issued: 2025-06-04
 execute:
   cache: false
 format:
@@ -786,6 +797,26 @@ This leads to better predictions, at least for the out-of-sample observation und
 Allowing some states to have large variance results in meaningful differences in the coefficients processes as well as the R2 over time.
 
 The non-centred state-space inference approach analysed in @fruhwirth2010stochastic would allow also non-ARR2 priors to exert stronger shrinkage on the state-standard deviations. It would be interesting derive the R2 prior for the non-centred formulation and then compare to non-centred versions of the competing priors here, too.
+
+# How to cite {.unnumbered}
+
+This case study carries Google Scholar citation metadata in the page header, so it is indexed and citable in the same way as a working paper. Please cite the case study itself when you use the code or the results, and cite @kohns2025arr2 for the ARR2 prior it applies. The same entry is regenerated automatically at the foot of the page.
+
+``` bibtex
+@online{kohns2025,
+  author    = {Kohns, David},
+  title     = {Dynamic {Regression} {Case} {Study}},
+  date      = {2025-06-04},
+  series    = {Case Studies in Bayesian Nowcasting},
+  publisher = {Aalto University},
+  url       = {https://davkoh.github.io/case-studies/01_dyn_reg/dyn_reg_casestudy5.html},
+  urldate   = {yyyy-mm-dd}
+}
+```
+
+In text: Kohns, D. (2025). *Dynamic Regression Case Study*. Case Studies in Bayesian Nowcasting. Aalto University. <https://davkoh.github.io/case-studies/01_dyn_reg/dyn_reg_casestudy5.html>
+
+Because the case study is updated over time, please record the access date, and where the exact version matters, cite the date shown as *Modified* at the top of the page.
 
 # Licenses {.unnumbered}
 

@@ -50,11 +50,11 @@ val <- function(spec, subsample, metric) {
 
 # Purpose
 
-@kohns2025midas develop a Bayesian mixed-data-sampling framework (BMIDAS) that applies group-shrinkage priors (GIGG), allows for estimation of latent (potentially slow-moving) trends and stochastic volatility with flexible hierarchical priors, and remains interpretable to the nowcaster due to the post-estimation sparsification algorithm which informs on variable importance over the nowcast cycle. The accompanying estimation code is released as the BMIDAS-GIGG toolbox [@bmidasgigg].
+@kohns2025midas develop a Bayesian mixed-data-sampling framework (BMIDAS) that applies group-shrinkage priors (GIGG) to mixed frequency data, allows for estimation of latent (potentially slow-moving) trends and stochastic volatility with flexible hierarchical priors, and remains interpretable to the nowcaster due to the post-estimation sparsification algorithm which informs on variable importance over the nowcast cycle. The accompanying estimation code is released as the BMIDAS-GIGG toolbox [@bmidasgigg].
 
 So far this framework has been applied to UK data only. Small open (post-Soviet) economies such as Estonia differ from the United Kingdom in the composition of their indicator sets, in the length of their reliable statistical record (which tends to start reliably typically in the early 2000's), and in the size and nature of shocks. Hence, in this case study, we put the Bayesian machinery of @kohns2025midas to the test by applying it to nowcasting Estonian q-o-q real GDP growth.
 
-Next to the specific application to nowcasting to new data, this case study also functions as a resource to document the various nowcasting methods at the frontier of Bayesian modelling (and therefore might be often updated) as well as describe a the data for a data base which will be publically available for the Estonian economy (and hopefully more in the future).
+Next to the specific application to nowcasting to new data, this case study also functions as a resource to document the various nowcasting methods at the frontier of Bayesian modelling (and therefore might be often updated) as well as describe the data for a data base which will be publically available for the Estonian economy (and hopefully more in the future).
 
 I summarise the aims of case study as as follows:
 
@@ -173,9 +173,9 @@ The estimation window expands. At each evaluation quarter the model is re-estima
 
 The last three quarters require a separate convention. Their outturn is either a flash estimate or not yet published, so they are used as conditioning information for the live nowcast (this is what we call the nowcast for the next arriving quarter, which is of now Q3-2026) but are excluded from every score reported below. Mixing a first-release vintage into the scored sample would compare models against a target that is itself subject to revision, and over the 16 quarters where both are available the flash and the final vintage differ by an average of 1 percentage point on a year-on-year basis.
 
-@fig-calendar summarises the same information visually, with indicators grouped by their release group. The numbers in each block tells us how many monthly lags (out of 6) are available to the modeler. For example at period 1, 120 days until GDP comes out, we have access in the first month of the reference quarter to this month's surveys, as well as all surveys of the previous quarter, which makes for 4 lags. Surveys are dark from the first round, prices fill in from the middle of the cycle, and real activity is not observed for the last month of the reference quarter throughout.
+@fig-calendar summarises the same information visually, with indicators grouped by their release group. The numbers in each block tells us how many monthly lags (out of 6) are available to the modeler. For example at round 1, 120 days until GDP comes out, we have access to the first month of the reference quarter's surveys, as well as all surveys of the previous quarter, which makes for the availability of 4 lags of surveys which can be fed to the model.
 
-Note that the choice to model with a total of 6 monthly lags is a modeling decision not a data availability issue. We could have for example used 12 lags in order to always use a year's worth of monthly data (this however, has been tested and not improved nowcasting).
+Note that the choice to model with a total of 6 monthly lags is a modeling decision not a data availability issue. We could have for example used 12 lags in order to always use a year's worth of monthly data (this however, has been tested and did not improve nowcasting performance).
 
 ```{r calendar-figure}
 #| label: fig-calendar
@@ -245,22 +245,24 @@ $$ {#eq-obs}
 with a random-walk trend and a random-walk log-variance,
 
 $$
-\tau_t = \tau_{t-1} + \exp(g_t/2)\,\eta_t, \qquad
-g_t = g_{t-1} + \omega_g\, \zeta_t, \qquad
-h_t = h_{t-1} + \omega_h\, \nu_t, \qquad
+\tau_t = \tau_{t-1} + \exp(g_t/2)\,\eta_t, \;
+g_t = g_{t-1} + \omega_g\, \zeta_t, \;
+h_t = h_{t-1} + \omega_h\, \nu_t, \;
 \eta_t, \zeta_t, \nu_t \sim N(0,1).
 $$ {#eq-states}
 
 Here $\tau_t$ is the stochastic trend, $h_t$ the log-variance of the observation equation, and $g_t$ the log-variance of the trend innovation, so the trend itself is allowed to move at a time-varying rate. The scale parameters $\omega_g$ and $\omega_h$ govern how much time variation the trend and the volatility admit, and the model nests a static trend at $\omega_g = 0$ and a homoskedastic observation equation at $\omega_h = 0$. This case study places penalised complexity priors [@simpson2017penalising] on both, in the non-centred parameterisation of @eq-states. The penalised complexity prior places an exponential penalty on the Kullback-Leibler distance from the simpler model in which the scale is zero, which is a static trend and a homoskedastic observation equation. This shrinks toward the simpler model without bounding the scale away from zero, which is the failure mode of the conditionally conjugate inverse-gamma alternative.
 
-The regression coefficients receive the group inverse-Gamma gamma prior (GIGG) as proposed in @kohns2025midas . Each indicator forms a group (of lags), to which 3-tiered hierarchical shrinkage is applied: 1) on the entire collection of groups, i.e., global shrinkage, 2) on the indicator group level, shrinking the collection of monthly lags jointly, 3) on the lag level which allows to estimate how correlated individual and group-wise shrinkage is. @kohns2025midas show that this prior significantly improves inference and nowcasting compared to popular shrinkage priors. Writing $\beta_{(i)}$ for the coefficient block of indicator $i$, the prior takes the following form:
+The regression coefficients receive the group inverse-Gamma gamma prior (GIGG) as proposed in @kohns2025midas . Each indicator forms a group (of lags), to which 3-tiered hierarchical shrinkage is applied: 1) on the entire collection of groups, i.e., global shrinkage $(\nu)$ , 2) on the indicator group level, shrinking the collection of monthly lags jointly $(\gamma_i)$ , 3) on the lag level which allows to estimate how correlated individual and group-wise shrinkage is $(\lambda_{i,m})$. @kohns2025midas show that this prior significantly improves inference and nowcasting compared to popular shrinkage priors. Writing $\beta_{(i)}$ for the coefficient block of indicator $i$, the prior takes the following form:
 
 $$
-\beta_{(i)} \mid \gamma_i, \lambda_{i,m} \sim
-N\!\left(0, \gamma_i \operatorname{diag}(\lambda_{i,1},\dots,\lambda_{i,M})\right),
+\beta_{(i)} \mid \nu, \gamma_i^2, \lambda_{i,m}^2 \sim
+N\!\left(0, \nu^2 \gamma_i^2 \operatorname{diag}(\lambda_{i,1}^2,\dots,\lambda^2_{i,M})\right),
+\qquad 
+\nu \sim \mathrm{C}_+(0,1)
 \qquad
-\gamma_i \sim \mathrm{Ga}(a_g, 1), \qquad
-\lambda_{i,m} \sim \mathrm{IG}(b_g, 1).
+\gamma_i^2 \sim \mathrm{Ga}(a_g, 1), \qquad
+\lambda_{i,m}^2 \sim \mathrm{IG}(b_g, 1).
 $$ {#eq-gigg}
 
 While it would be possible to set the hyperparameters $(a_g,b_g)$ for each indicator separately, we follow the recommendations of @kohns2025midas by estimating $a_g$ via a hierarchical prior and set $b_g=0.5$ in order to push the posterior on $\beta_{(i)}$ toward high intra group correlation.
