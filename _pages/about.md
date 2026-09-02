@@ -19,6 +19,7 @@ I am a reviewer for several journals including *International Journal of Forecas
 News
 ======
 
+- **September 2026** — I have accepted a tenure-track position in Data Science in Economics at [TalTech's Department of Economics and Finance](https://taltech.ee/en/department-economics-and-finance) (Tallinn University of Technology), starting 1 November 2026.
 - **August 2026** — New case study out: [Nowcasting Estonian GDP with Bayesian MIDAS](/case-studies/03_estonia_nowcast/index.html), featuring a real-time Estonian dataset, a suite of mixed-frequency models, and a continually updated performance benchmark.
 - **August 2026** — I served as a session chair at [StanCon 2026](https://www.stancon2026.org/) in Uppsala (17–21 August 2026). A [recording of the session I chaired](https://www.youtube.com/watch?v=wIR1YXFrNaE&t=1144s) is available on YouTube.
 
